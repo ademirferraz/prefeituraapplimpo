@@ -1,0 +1,82 @@
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { TextInputMask } from 'react-native-masked-text';
+import { auth, db } from '../firebaseConfig';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { collection, addDoc } from 'firebase/firestore';
+
+export default function CadastroScreen({ navigation }) {
+  const [nome, setNome] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [dataNascimento, setDataNascimento] = useState('');
+
+  const handleCadastro = async () => {
+    if (!nome || !cpf || !senha || !dataNascimento) {
+      Alert.alert('Erro', 'Preencha todos os campos obrigatórios');
+      return;
+    }
+
+    try {
+      const emailFinal = email || `${cpf.replace(/\D/g, '')}@prefeituraapp.com`;
+      const userCredential = await createUserWithEmailAndPassword(auth, emailFinal, senha);
+      const user = userCredential.user;
+
+      await addDoc(collection(db, 'usuarios'), {
+        uid: user.uid,
+        nome,
+        cpf,
+        senha,
+        email: email || null,
+        dataNascimento,
+      });
+
+      Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+      navigation.navigate('Home');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erro', 'Não foi possível cadastrar');
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.titulo}>Cadastro</Text>
+
+      <TextInput style={styles.input} placeholder="Nome" value={nome} onChangeText={setNome} />
+      <TextInput style={styles.input} placeholder="Email (opcional)" value={email} onChangeText={setEmail} keyboardType="email-address" />
+      <TextInput style={styles.input} placeholder="Senha" value={senha} onChangeText={setSenha} secureTextEntry />
+      <TextInputMask type={'cpf'} value={cpf} onChangeText={setCpf} style={styles.input} placeholder="CPF" />
+      <TextInputMask type={'datetime'} options={{ format: 'DD/MM/YYYY' }} value={dataNascimento} onChangeText={setDataNascimento} style={styles.input} placeholder="Data de nascimento" />
+
+      <TouchableOpacity style={styles.botao} onPress={handleCadastro}>
+        <Text style={styles.botaoTexto}>Cadastrar</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => navigation.navigate('Welcome')}>
+        <Text style={styles.voltar}>Voltar para a tela inicial</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  titulo: { fontSize: 22, fontWeight: 'bold', marginBottom: 20 },
+  input: {
+    backgroundColor: '#e6f2ff',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+    fontSize: 16,
+  },
+  botao: {
+    backgroundColor: '#0077cc',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  botaoTexto: { color: '#fff', fontSize: 18 },
+  voltar: { color: '#0077cc', marginTop: 20, textAlign: 'center' },
+});

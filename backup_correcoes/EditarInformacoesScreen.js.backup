@@ -1,0 +1,76 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export default function EditarInformacoesScreen() {
+  const [informacoes, setInformacoes] = useState('');
+  const [aviso, setAviso] = useState('');
+
+  useEffect(() => {
+    const carregarDados = async () => {
+      const infoSalva = await AsyncStorage.getItem('informacoes');
+      const avisoSalvo = await AsyncStorage.getItem('aviso');
+      if (infoSalva) setInformacoes(infoSalva);
+      if (avisoSalvo) setAviso(avisoSalvo);
+    };
+    carregarDados();
+  }, []);
+
+  const salvarDados = async () => {
+    try {
+      await AsyncStorage.setItem('informacoes', informacoes);
+      await AsyncStorage.setItem('aviso', aviso);
+      Alert.alert('Dados salvos com sucesso!');
+    } catch (error) {
+      Alert.alert('Erro ao salvar os dados');
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.label}>Informações:</Text>
+      <TextInput
+        style={styles.input}
+        value={informacoes}
+        onChangeText={setInformacoes}
+        multiline
+      />
+
+      <Text style={styles.label}>Aviso:</Text>
+      <TextInput
+        style={styles.input}
+        value={aviso}
+        onChangeText={setAviso}
+        multiline
+      />
+
+      <TouchableOpacity style={styles.botao} onPress={salvarDados}>
+        <Text style={styles.botaoTexto}>Salvar</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20 },
+  label: { fontSize: 16, marginBottom: 5 },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+    textAlignVertical: 'top',
+    minHeight: 80,
+  },
+  botao: {
+    backgroundColor: '#007bff',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  botaoTexto: {
+    color: '#fff',
+    fontSize: 16,
+  },
+});

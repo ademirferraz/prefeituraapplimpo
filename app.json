@@ -1,29 +1,45 @@
 {
   "expo": {
-    "name": "prefeituraAppLimpo",
+    "name": "Prefeitura",
     "slug": "prefeituraAppLimpo",
-    "version": "1.0.0",
+    "version": "1.0.2",
+     "main": "App.js",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "scheme": "prefeitura",
+    "description": "Aplicativo oficial da Prefeitura de Bom Conselho para serviços e elogios",
+    "assetBundlePatterns": ["**/*"],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.prefeitura.bomconselho.app",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Este app precisa acessar suas fotos para enviar elogios.",
+        "NSCameraUsageDescription": "Este app precisa acessar a câmera para gravar mídia.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true
+      "package": "com.prefeitura.bomconselho.app"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9e77698f-937b-4e01-918a-eb1088ce7342"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/9e77698f-937b-4e01-918a-eb1088ce7342"
     }
   }
 }

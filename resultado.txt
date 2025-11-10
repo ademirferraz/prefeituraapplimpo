@@ -1,0 +1,26 @@
+existem 483 arquivos, sendo os principais:
+D:\projetos\prefeituraAppLimpo\screens\AdminLoginScreen.js
+D:\projetos\prefeituraAppLimpo\screens\CadastroScreen.js
+D:\projetos\prefeituraAppLimpo\screens\CadastroScreen.old.js
+D:\projetos\prefeituraAppLimpo\screens\DenunciaScreen.js
+D:\projetos\prefeituraAppLimpo\screens\EditarInformacoesScreen.js
+D:\projetos\prefeituraAppLimpo\screens\ElogiosScreen.js
+D:\projetos\prefeituraAppLimpo\screens\EnviarScreen.js
+D:\projetos\prefeituraAppLimpo\screens\EventosPessoaisScreen.js
+D:\projetos\prefeituraAppLimpo\screens\GaleriaScreen.js
+D:\projetos\prefeituraAppLimpo\screens\GravarMidiaScreen.js
+D:\projetos\prefeituraAppLimpo\screens\HistoricoScreen.js
+D:\projetos\prefeituraAppLimpo\screens\HomeScreen.js
+D:\projetos\prefeituraAppLimpo\screens\InformacoesScreen.js
+D:\projetos\prefeituraAppLimpo\screens\InicioScreen.js
+D:\projetos\prefeituraAppLimpo\screens\LoginScreen.js
+D:\projetos\prefeituraAppLimpo\screens\PainelAdminScreen.js
+D:\projetos\prefeituraAppLimpo\screens\PerigoScreen.js
+D:\projetos\prefeituraAppLimpo\screens\RecuperarSenhaScreen.js
+D:\projetos\prefeituraAppLimpo\screens\ServicosScreen.js
+D:\projetos\prefeituraAppLimpo\screens\SugestaoScreen.js
+
+
+
+D:\projetos\prefeituraAppLimpo\assets
+

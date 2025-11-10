@@ -1,0 +1,81 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+
+export default function AdminLoginScreen() {
+  const navigation = useNavigation();
+  const [senhaDigitada, setSenhaDigitada] = useState('');
+
+  // === LIMPEZA AUTOMÁTICA DE ESTADOS AO SAIR DA TELA ===
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setSenhaDigitada("");
+      };
+    }, [])
+  );
+
+
+  const verificarSenha = async () => {
+    const dadosAdmin = await AsyncStorage.getItem('admin');
+    const senhaSalva = dadosAdmin ? JSON.parse(dadosAdmin).senha : null;
+
+    if (senhaDigitada === senhaSalva) {
+      await AsyncStorage.setItem('isAdmin', 'true'); // ✅ sinaliza que é admin
+      navigation.navigate('Home'); // ✅ redireciona para tela principal
+    } else {
+      Alert.alert('Senha incorreta');
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.voltar}>
+        <Text style={styles.voltarTexto}>← Voltar</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.titulo}>Acesso do Administrador</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Digite a senha"
+        secureTextEntry
+        value={senhaDigitada}
+        onChangeText={setSenhaDigitada}
+      />
+
+      <TouchableOpacity style={styles.botao} onPress={verificarSenha}>
+        <Text style={styles.botaoTexto}>Entrar</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20, justifyContent: 'center', backgroundColor: '#fff' },
+  voltar: { position: 'absolute', top: 40, left: 20 },
+  voltarTexto: { fontSize: 16, color: '#1565c0', fontWeight: 'bold' },
+  titulo: { fontSize: 22, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', color: '#0d47a1' },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 6,
+    padding: 10,
+    marginBottom: 20,
+  },
+  botao: {
+    backgroundColor: '#1565c0',
+    padding: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  botaoTexto: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+});

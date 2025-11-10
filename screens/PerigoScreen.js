@@ -1,0 +1,179 @@
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+
+export default function PerigoScreen() {
+  const [descricao, setDescricao] = useState('');
+  const [localizacao, setLocalizacao] = useState('');
+  const [enviado, setEnviado] = useState(false);
+
+  // === LIMPEZA AUTOMÁTICA DE ESTADOS AO SAIR DA TELA ===
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setDescricao(""); setLocalizacao(""); setEnviado(false);
+      };
+    }, [])
+  );
+
+
+  const enviarAlerta = () => {
+    if (descricao.trim() === '' || localizacao.trim() === '') {
+      Alert.alert('Atenção', 'Por favor, preencha todos os campos.');
+      return;
+    }
+    
+    // Simulando envio bem-sucedido
+    console.log('Alerta enviado:', { descricao, localizacao });
+    setEnviado(true);
+    
+    // Reset após 3 segundos
+    setTimeout(() => {
+      setDescricao('');
+      setLocalizacao('');
+      setEnviado(false);
+    }, 3000);
+  };
+
+  return (
+    <ScrollView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>⚠️ Relatar Perigo</Text>
+        <Text style={styles.subtitle}>Informe situações de risco ou emergência.</Text>
+      </View>
+      
+      {enviado ? (
+        <View style={styles.alertSuccess}>
+          <Text style={styles.alertTitle}>Alerta enviado com sucesso!</Text>
+          <Text style={styles.alertText}>As autoridades foram notificadas.</Text>
+          <Text style={styles.alertText}>Em caso de emergência, ligue também para os números de emergência.</Text>
+        </View>
+      ) : (
+        <View style={styles.formContainer}>
+          <Text style={styles.label}>Descreva a situação de perigo:</Text>
+          <TextInput
+            style={styles.input}
+            multiline
+            numberOfLines={4}
+            placeholder="Ex: Árvore caída bloqueando a rua..."
+            value={descricao}
+            onChangeText={setDescricao}
+          />
+          
+          <Text style={styles.label}>Localização:</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Ex: Rua das Flores, próximo ao número 123"
+            value={localizacao}
+            onChangeText={setLocalizacao}
+          />
+          
+          <TouchableOpacity style={styles.button} onPress={enviarAlerta}>
+            <Text style={styles.buttonText}>Enviar Alerta</Text>
+          </TouchableOpacity>
+          
+          <View style={styles.emergencyContainer}>
+            <Text style={styles.emergencyTitle}>Números de Emergência:</Text>
+            <Text style={styles.emergencyText}>Bombeiros: 193</Text>
+            <Text style={styles.emergencyText}>SAMU: 192</Text>
+            <Text style={styles.emergencyText}>Polícia: 190</Text>
+            <Text style={styles.emergencyText}>Defesa Civil: 199</Text>
+          </View>
+        </View>
+      )}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  header: {
+    backgroundColor: '#ffebee',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ffcdd2',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#c62828',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#d32f2f',
+    textAlign: 'center',
+    marginTop: 5,
+  },
+  formContainer: {
+    padding: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 5,
+    color: '#333',
+  },
+  input: {
+    backgroundColor: '#f5f5f5',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+  },
+  button: {
+    backgroundColor: '#d32f2f',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  emergencyContainer: {
+    marginTop: 30,
+    padding: 15,
+    backgroundColor: '#ffebee',
+    borderRadius: 5,
+    borderLeftWidth: 4,
+    borderLeftColor: '#d32f2f',
+  },
+  emergencyTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#b71c1c',
+  },
+  emergencyText: {
+    fontSize: 14,
+    marginBottom: 5,
+    color: '#333',
+  },
+  alertSuccess: {
+    margin: 20,
+    padding: 20,
+    backgroundColor: '#e8f5e9',
+    borderRadius: 8,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#c8e6c9',
+  },
+  alertTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2e7d32',
+    marginBottom: 10,
+  },
+  alertText: {
+    fontSize: 14,
+    color: '#388e3c',
+    textAlign: 'center',
+    marginBottom: 5,
+  }
+});

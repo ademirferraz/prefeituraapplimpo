@@ -1,0 +1,180 @@
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { db } from '../firebaseConfig';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+
+const EVENT_TYPES = [
+  { key: 'birthday', label: 'Aniversário' },
+  { key: 'wedding', label: 'Casamento' },
+  { key: 'birth', label: 'Nascimento' },
+  { key: 'death', label: 'Falecimento' },
+  { key: 'holiday', label: 'Feriado' },
+];
+
+export default function EventosPessoaisScreen({ navigation }) {
+  const [tipo, setTipo] = useState('birthday');
+  const [nomePessoa, setNomePessoa] = useState('');
+  const [dataEvento, setDataEvento] = useState(''); // DD/MM/AAAA
+  const [descricao, setDescricao] = useState('');
+
+  // === LIMPEZA AUTOMÁTICA DE ESTADOS AO SAIR DA TELA ===
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setNomePessoa(""); setDataEvento(""); setDescricao("");
+      };
+    }, [])
+  );
+
+
+  const isValidDateBR = (value) => {
+    const m = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (!m) return false;
+    const d = parseInt(m[1], 10), mo = parseInt(m[2], 10), y = parseInt(m[3], 10);
+    const dt = new Date(y, mo - 1, d);
+    return dt.getFullYear() === y && dt.getMonth() === mo - 1 && dt.getDate() === d && y >= 1900 && y <= 2100;
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (!tipo) {
+        Alert.alert('Atenção', 'Selecione o tipo do evento.');
+        return;
+      }
+      if (!isValidDateBR(dataEvento)) {
+        Alert.alert('Atenção', 'Data inválida. Use DD/MM/AAAA.');
+        return;
+      }
+      if (!descricao.trim()) {
+        Alert.alert('Atenção', 'Descreva brevemente o evento.');
+        return;
+      }
+
+      const userDataStr = await AsyncStorage.getItem('userData');
+      if (!userDataStr) {
+        Alert.alert('Cadastro necessário', 'Faça o cadastro para enviar um evento.');
+        navigation.navigate('Cadastro');
+        return;
+      }
+      const user = JSON.parse(userDataStr);
+
+      const payload = {
+        tipo,
+        nomePessoa: nomePessoa.trim() || user.nome,
+        dataEvento,
+        descricao: descricao.trim(),
+        status: 'pending',
+        solicitante: { nome: user.nome, cpf: user.cpf },
+        createdAt: Date.now(),
+      };
+
+      // Grava no Firestore se estiver configurado; caso contrário, salva local para posterior sincronização
+      let savedRemote = false;
+      try {
+        if (db) {
+          await addDoc(collection(db, 'personalEvents'), {
+            ...payload,
+            createdAt: Timestamp.fromMillis(payload.createdAt),
+          });
+          savedRemote = true;
+        }
+      } catch (e) {
+        // Ignora se Firebase não estiver configurado
+      }
+
+      if (!savedRemote) {
+        try {
+          const localStr = await AsyncStorage.getItem('personalEventsPending');
+          const localArr = localStr ? JSON.parse(localStr) : [];
+          localArr.push(payload);
+          await AsyncStorage.setItem('personalEventsPending', JSON.stringify(localArr));
+        } catch {}
+      }
+
+      Alert.alert('Sucesso', 'Evento enviado para validação pela Prefeitura.');
+      setNomePessoa('');
+      setDataEvento('');
+      setDescricao('');
+      setTipo('birthday');
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível enviar o evento.');
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Eventos Pessoais</Text>
+      <Text style={styles.subtitle}>Informe um evento para mensagem personalizada do Prefeito</Text>
+
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>Tipo do Evento *</Text>
+        <View style={styles.pillRow}>
+          {EVENT_TYPES.map((et) => (
+            <TouchableOpacity
+              key={et.key}
+              style={[styles.pill, tipo === et.key ? styles.pillActive : null]}
+              onPress={() => setTipo(et.key)}
+            >
+              <Text style={[styles.pillText, tipo === et.key ? styles.pillTextActive : null]}>{et.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>Nome do(a) homenageado(a) (opcional)</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Ex.: Maria Silva"
+          value={nomePessoa}
+          onChangeText={setNomePessoa}
+        />
+      </View>
+
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>Data do Evento *</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="DD/MM/AAAA"
+          value={dataEvento}
+          onChangeText={setDataEvento}
+          keyboardType="numeric"
+          maxLength={10}
+        />
+      </View>
+
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>Descrição *</Text>
+        <TextInput
+          style={[styles.input, { height: 100 }]}
+          placeholder="Breve descrição para contexto"
+          value={descricao}
+          onChangeText={setDescricao}
+          multiline
+        />
+      </View>
+
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <Text style={styles.buttonText}>Enviar para validação</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20, backgroundColor: '#f5f5f5' },
+  title: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 8, color: '#6a1b9a' },
+  subtitle: { fontSize: 14, textAlign: 'center', color: '#666', marginBottom: 20 },
+  formGroup: { marginBottom: 16 },
+  label: { fontSize: 15, marginBottom: 8, color: '#333', fontWeight: '500' },
+  input: { borderWidth: 1, borderColor: '#ddd', padding: 12, borderRadius: 8, backgroundColor: '#fff', fontSize: 16 },
+  button: { backgroundColor: '#6a1b9a', borderRadius: 8, padding: 14, alignItems: 'center', marginTop: 8 },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  pillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  pill: { borderWidth: 1, borderColor: '#6a1b9a', borderRadius: 20, paddingVertical: 8, paddingHorizontal: 12, marginRight: 8, marginBottom: 8 },
+  pillActive: { backgroundColor: '#6a1b9a' },
+  pillText: { color: '#6a1b9a', fontWeight: '600' },
+  pillTextActive: { color: '#fff' },
+});

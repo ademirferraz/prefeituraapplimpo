@@ -1,0 +1,320 @@
+RELATÓRIO DE useState - 20 TELAS CRÍTICAS
+======================================================================
+
+1. ESTADOS COM VALORES INICIAIS INDEVIDOS
+--------------------------------------------------
+AdminLoginScreen.js
+   → senhaDigitada = useState('')
+     Linha 15 | Limpar com useFocusEffect ao sair da tela
+
+CadastroScreen.js
+   → nome = useState('')
+     Linha 9 | Limpar com useFocusEffect ao sair da tela
+
+CadastroScreen.js
+   → cpf = useState('')
+     Linha 10 | Limpar com useFocusEffect ao sair da tela
+
+CadastroScreen.js
+   → email = useState('')
+     Linha 11 | Limpar com useFocusEffect ao sair da tela
+
+CadastroScreen.js
+   → senha = useState('')
+     Linha 12 | Limpar com useFocusEffect ao sair da tela
+
+CadastroScreen.js
+   → dataNascimento = useState('')
+     Linha 13 | Limpar com useFocusEffect ao sair da tela
+
+CadastroScreen.old.js
+   → nome = useState('')
+     Linha 5 | Limpar com useFocusEffect ao sair da tela
+
+CadastroScreen.old.js
+   → cpf = useState('')
+     Linha 6 | Limpar com useFocusEffect ao sair da tela
+
+CadastroScreen.old.js
+   → email = useState('')
+     Linha 7 | Limpar com useFocusEffect ao sair da tela
+
+CadastroScreen.old.js
+   → senha = useState('')
+     Linha 8 | Limpar com useFocusEffect ao sair da tela
+
+DenunciaScreen.js
+   → titulo = useState('')
+     Linha 15 | Limpar com useFocusEffect ao sair da tela
+
+DenunciaScreen.js
+   → descricao = useState('')
+     Linha 16 | Limpar com useFocusEffect ao sair da tela
+
+EditarInformacoesScreen.js
+   → informacoes = useState('')
+     Linha 6 | Limpar com useFocusEffect ao sair da tela
+
+EditarInformacoesScreen.js
+   → aviso = useState('')
+     Linha 7 | Limpar com useFocusEffect ao sair da tela
+
+ElogiosScreen.js
+   → mensagem = useState('')
+     Linha 16 | Limpar com useFocusEffect ao sair da tela
+
+ElogiosScreen.js
+   → imagem = useState(null)
+     Linha 17 | Limpar com useFocusEffect ao sair da tela
+
+EnviarScreen.js
+   → imagem = useState(null)
+     Linha 13 | Limpar com useFocusEffect ao sair da tela
+
+EnviarScreen.js
+   → carregando = useState(false)
+     Linha 14 | Limpar com useFocusEffect ao sair da tela
+
+EnviarScreen.js
+   → nome = useState('')
+     Linha 15 | Limpar com useFocusEffect ao sair da tela
+
+EnviarScreen.js
+   → cpf = useState('')
+     Linha 16 | Limpar com useFocusEffect ao sair da tela
+
+EnviarScreen.js
+   → documento = useState(null)
+     Linha 18 | Limpar com useFocusEffect ao sair da tela
+
+EnviarScreen.js
+   → showPostActionModal = useState(false)
+     Linha 19 | Limpar com useFocusEffect ao sair da tela
+
+EventosPessoaisScreen.js
+   → nomePessoa = useState('')
+     Linha 17 | Limpar com useFocusEffect ao sair da tela
+
+EventosPessoaisScreen.js
+   → dataEvento = useState('')
+     Linha 18 | Limpar com useFocusEffect ao sair da tela
+
+EventosPessoaisScreen.js
+   → descricao = useState('')
+     Linha 19 | Limpar com useFocusEffect ao sair da tela
+
+GaleriaScreen.js
+   → midias = useState([])
+     Linha 8 | Limpar com useFocusEffect ao sair da tela
+
+GravarMidiaScreen.js
+   → hasPermission = useState(null)
+     Linha 16 | Limpar com useFocusEffect ao sair da tela
+
+GravarMidiaScreen.js
+   → capturedMedia = useState(null)
+     Linha 22 | Limpar com useFocusEffect ao sair da tela
+
+HistoricoScreen.js
+   → manifestacoes = useState([])
+     Linha 7 | Limpar com useFocusEffect ao sair da tela
+
+HomeScreen.js
+   → isAdmin = useState(false)
+     Linha 16 | Limpar com useFocusEffect ao sair da tela
+
+InformacoesScreen.js
+   → expandedItem = useState(null)
+     Linha 8 | Limpar com useFocusEffect ao sair da tela
+
+InformacoesScreen.js
+   → isAdmin = useState(false)
+     Linha 9 | Limpar com useFocusEffect ao sair da tela
+
+InformacoesScreen.js
+   → newTitle = useState('')
+     Linha 42 | Limpar com useFocusEffect ao sair da tela
+
+InformacoesScreen.js
+   → newContent = useState('')
+     Linha 43 | Limpar com useFocusEffect ao sair da tela
+
+InformacoesScreen.js
+   → newAnexo = useState('')
+     Linha 44 | Limpar com useFocusEffect ao sair da tela
+
+InformacoesScreen.js
+   → editId = useState(null)
+     Linha 45 | Limpar com useFocusEffect ao sair da tela
+
+InformacoesScreen.js
+   → editTitle = useState('')
+     Linha 46 | Limpar com useFocusEffect ao sair da tela
+
+InformacoesScreen.js
+   → editContent = useState('')
+     Linha 47 | Limpar com useFocusEffect ao sair da tela
+
+InformacoesScreen.js
+   → editAnexo = useState('')
+     Linha 48 | Limpar com useFocusEffect ao sair da tela
+
+InicioScreen.js
+   → nome = useState('')
+     Linha 22 | Limpar com useFocusEffect ao sair da tela
+
+InicioScreen.js
+   → cpf = useState('')
+     Linha 23 | Limpar com useFocusEffect ao sair da tela
+
+InicioScreen.js
+   → dataNascimento = useState('')
+     Linha 24 | Limpar com useFocusEffect ao sair da tela
+
+InicioScreen.js
+   → senha = useState('')
+     Linha 25 | Limpar com useFocusEffect ao sair da tela
+
+InicioScreen.js
+   → confirmSenha = useState('')
+     Linha 26 | Limpar com useFocusEffect ao sair da tela
+
+InicioScreen.js
+   → senhaError = useState('')
+     Linha 27 | Limpar com useFocusEffect ao sair da tela
+
+LoginScreen.js
+   → cpf = useState('')
+     Linha 7 | Limpar com useFocusEffect ao sair da tela
+
+LoginScreen.js
+   → senha = useState('')
+     Linha 8 | Limpar com useFocusEffect ao sair da tela
+
+PainelAdminScreen.js
+   → aniversariantesHoje = useState([])
+     Linha 21 | Limpar com useFocusEffect ao sair da tela
+
+PainelAdminScreen.js
+   → aniversariantesFuturos = useState([])
+     Linha 22 | Limpar com useFocusEffect ao sair da tela
+
+PainelAdminScreen.js
+   → mensagemGerada = useState('')
+     Linha 23 | Limpar com useFocusEffect ao sair da tela
+
+PerigoScreen.js
+   → descricao = useState('')
+     Linha 5 | Limpar com useFocusEffect ao sair da tela
+
+PerigoScreen.js
+   → localizacao = useState('')
+     Linha 6 | Limpar com useFocusEffect ao sair da tela
+
+PerigoScreen.js
+   → enviado = useState(false)
+     Linha 7 | Limpar com useFocusEffect ao sair da tela
+
+RecuperarSenhaScreen.js
+   → cpfFinal = useState('')
+     Linha 8 | Limpar com useFocusEffect ao sair da tela
+
+RecuperarSenhaScreen.js
+   → emailRecuperacao = useState('')
+     Linha 9 | Limpar com useFocusEffect ao sair da tela
+
+RecuperarSenhaScreen.js
+   → novaSenha = useState('')
+     Linha 10 | Limpar com useFocusEffect ao sair da tela
+
+ServicosScreen.js
+   → isAdmin = useState(false)
+     Linha 21 | Limpar com useFocusEffect ao sair da tela
+
+ServicosScreen.js
+   → serviceLinks = useState({})
+     Linha 22 | Limpar com useFocusEffect ao sair da tela
+
+ServicosScreen.js
+   → downloads = useState([])
+     Linha 23 | Limpar com useFocusEffect ao sair da tela
+
+SugestaoScreen.js
+   → sugestao = useState('')
+     Linha 5 | Limpar com useFocusEffect ao sair da tela
+
+SugestaoScreen.js
+   → categoria = useState('')
+     Linha 6 | Limpar com useFocusEffect ao sair da tela
+
+SugestaoScreen.js
+   → enviado = useState(false)
+     Linha 7 | Limpar com useFocusEffect ao sair da tela
+
+
+2. ESTADOS DUPLICADOS ENTRE TELAS
+--------------------------------------------------
+nome → usado em 4 telas:
+   • CadastroScreen.js
+   • CadastroScreen.old.js
+   • EnviarScreen.js
+   • InicioScreen.js
+
+cpf → usado em 5 telas:
+   • CadastroScreen.js
+   • CadastroScreen.old.js
+   • EnviarScreen.js
+   • InicioScreen.js
+   • LoginScreen.js
+
+email → usado em 2 telas:
+   • CadastroScreen.js
+   • CadastroScreen.old.js
+
+senha → usado em 4 telas:
+   • CadastroScreen.js
+   • CadastroScreen.old.js
+   • InicioScreen.js
+   • LoginScreen.js
+
+dataNascimento → usado em 2 telas:
+   • CadastroScreen.js
+   • InicioScreen.js
+
+descricao → usado em 3 telas:
+   • DenunciaScreen.js
+   • EventosPessoaisScreen.js
+   • PerigoScreen.js
+
+informacoes → usado em 2 telas:
+   • EditarInformacoesScreen.js
+   • InformacoesScreen.js
+
+imagem → usado em 2 telas:
+   • ElogiosScreen.js
+   • EnviarScreen.js
+
+carregando → usado em 2 telas:
+   • EnviarScreen.js
+   • GaleriaScreen.js
+
+isAdmin → usado em 3 telas:
+   • HomeScreen.js
+   • InformacoesScreen.js
+   • ServicosScreen.js
+
+enviado → usado em 2 telas:
+   • PerigoScreen.js
+   • SugestaoScreen.js
+
+
+======================================================================
+RESUMO
+Telas analisadas: 20/20
+useState encontrados: 67
+Estados problemáticos: 62
+Estados duplicados: 11
+
+Relatórios gerados:
+   • relatorio_useState.txt
+   • relatorio_useState.csv

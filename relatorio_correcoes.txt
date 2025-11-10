@@ -1,0 +1,86 @@
+RELATÓRIO DE CORREÇÕES AUTOMÁTICAS
+==================================================
+
+20 arquivo(s) corrigidos:
+
+AdminLoginScreen.js
+   → senhaDigitada
+   Backup: backup_correcoes\AdminLoginScreen.js.backup
+
+CadastroScreen.js
+   → nome, cpf, email, senha, dataNascimento
+   Backup: backup_correcoes\CadastroScreen.js.backup
+
+CadastroScreen.old.js
+   → nome, cpf, email, senha
+   Backup: backup_correcoes\CadastroScreen.old.js.backup
+
+DenunciaScreen.js
+   → titulo, descricao
+   Backup: backup_correcoes\DenunciaScreen.js.backup
+
+EditarInformacoesScreen.js
+   → informacoes, aviso
+   Backup: backup_correcoes\EditarInformacoesScreen.js.backup
+
+ElogiosScreen.js
+   → mensagem, imagem
+   Backup: backup_correcoes\ElogiosScreen.js.backup
+
+EnviarScreen.js
+   → imagem, carregando, nome, cpf, documento, showPostActionModal
+   Backup: backup_correcoes\EnviarScreen.js.backup
+
+EventosPessoaisScreen.js
+   → nomePessoa, dataEvento, descricao
+   Backup: backup_correcoes\EventosPessoaisScreen.js.backup
+
+GaleriaScreen.js
+   → midias
+   Backup: backup_correcoes\GaleriaScreen.js.backup
+
+GravarMidiaScreen.js
+   → hasPermission, capturedMedia
+   Backup: backup_correcoes\GravarMidiaScreen.js.backup
+
+HistoricoScreen.js
+   → manifestacoes
+   Backup: backup_correcoes\HistoricoScreen.js.backup
+
+HomeScreen.js
+   → isAdmin
+   Backup: backup_correcoes\HomeScreen.js.backup
+
+InformacoesScreen.js
+   → expandedItem, isAdmin, newTitle, newContent, newAnexo, editId, editTitle, editContent, editAnexo
+   Backup: backup_correcoes\InformacoesScreen.js.backup
+
+InicioScreen.js
+   → nome, cpf, dataNascimento, senha, confirmSenha, senhaError
+   Backup: backup_correcoes\InicioScreen.js.backup
+
+LoginScreen.js
+   → cpf, senha
+   Backup: backup_correcoes\LoginScreen.js.backup
+
+PainelAdminScreen.js
+   → aniversariantesHoje, aniversariantesFuturos, mensagemGerada
+   Backup: backup_correcoes\PainelAdminScreen.js.backup
+
+PerigoScreen.js
+   → descricao, localizacao, enviado
+   Backup: backup_correcoes\PerigoScreen.js.backup
+
+RecuperarSenhaScreen.js
+   → cpfFinal, emailRecuperacao, novaSenha
+   Backup: backup_correcoes\RecuperarSenhaScreen.js.backup
+
+ServicosScreen.js
+   → isAdmin, serviceLinks, downloads
+   Backup: backup_correcoes\ServicosScreen.js.backup
+
+SugestaoScreen.js
+   → sugestao, categoria, enviado
+   Backup: backup_correcoes\SugestaoScreen.js.backup
+
+Backups salvos em: ./backup_correcoes/

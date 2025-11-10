@@ -1,0 +1,99 @@
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { auth, db } from '../firebaseConfig';
+
+export default function RecuperarSenhaScreen({ navigation }) {
+  const [cpfFinal, setCpfFinal] = useState('');
+  const [emailRecuperacao, setEmailRecuperacao] = useState('');
+  const [novaSenha, setNovaSenha] = useState('');
+
+  const handleRecuperarPorEmail = async () => {
+    if (!emailRecuperacao) {
+      Alert.alert('Erro', 'Informe o e-mail cadastrado');
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, emailRecuperacao);
+      Alert.alert('Sucesso', 'Um link de recuperação foi enviado para seu e-mail');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erro', 'Não foi possível enviar o e-mail de recuperação');
+    }
+  };
+
+  const handleRecuperarPorCPF = async () => {
+    if (!cpfFinal || !novaSenha) {
+      Alert.alert('Erro', 'Preencha os campos corretamente');
+      return;
+    }
+
+    try {
+      const usuariosRef = collection(db, 'usuarios');
+      const q = query(usuariosRef, where('cpf', '>=', `0000000000${cpfFinal}`));
+      const querySnapshot = await getDocs(q);
+
+      let encontrado = false;
+
+      querySnapshot.forEach(async (docSnap) => {
+        const cpf = docSnap.data().cpf;
+        if (cpf.endsWith(cpfFinal)) {
+          const ref = doc(db, 'usuarios', docSnap.id);
+          await updateDoc(ref, { senha: novaSenha });
+          encontrado = true;
+          Alert.alert('Sucesso', 'Senha redefinida com sucesso!');
+          navigation.navigate('Login');
+        }
+      });
+
+      if (!encontrado) {
+        Alert.alert('Erro', 'CPF não encontrado');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erro', 'Não foi possível redefinir a senha');
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.titulo}>Recuperar Senha</Text>
+
+      <Text style={styles.subtitulo}>Opção 1: Recuperar por e-mail</Text>
+      <TextInput style={styles.input} placeholder="E-mail cadastrado" value={emailRecuperacao} onChangeText={setEmailRecuperacao} />
+      <TouchableOpacity style={styles.botao} onPress={handleRecuperarPorEmail}>
+        <Text style={styles.botaoTexto}>Enviar link de recuperação</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.subtitulo}>Opção 2: Recuperar por CPF</Text>
+      <TextInput style={styles.input} placeholder="Últimos 4 dígitos do CPF" value={cpfFinal} onChangeText={setCpfFinal} keyboardType="numeric" />
+      <TextInput style={styles.input} placeholder="Nova senha" value={novaSenha} onChangeText={setNovaSenha} secureTextEntry />
+      <TouchableOpacity style={styles.botao} onPress={handleRecuperarPorCPF}>
+        <Text style={styles.botaoTexto}>Redefinir senha</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { padding: 20, backgroundColor: '#fff', flex: 1 },
+  titulo: { fontSize: 22, fontWeight: 'bold', marginBottom: 20 },
+  subtitulo: { fontSize: 16, fontWeight: '600', marginTop: 20, marginBottom: 10 },
+  input: {
+    backgroundColor: '#e6f2ff',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+    fontSize: 16,
+  },
+  botao: {
+    backgroundColor: '#0077cc',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  botaoTexto: { color: '#fff', fontSize: 16 },
+});

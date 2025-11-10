@@ -1,0 +1,184 @@
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+
+export default function SugestaoScreen() {
+  const [sugestao, setSugestao] = useState('');
+  const [categoria, setCategoria] = useState('');
+  const [enviado, setEnviado] = useState(false);
+
+  // === LIMPEZA AUTOMÁTICA DE ESTADOS AO SAIR DA TELA ===
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setSugestao(""); setCategoria(""); setEnviado(false);
+      };
+    }, [])
+  );
+
+
+  const categorias = ['Infraestrutura', 'Saúde', 'Educação', 'Segurança', 'Meio Ambiente', 'Outro'];
+
+  const enviarSugestao = () => {
+    if (sugestao.trim() === '' || categoria === '') {
+      Alert.alert('Atenção', 'Por favor, preencha todos os campos.');
+      return;
+    }
+    
+    // Simulando envio bem-sucedido
+    console.log('Sugestão enviada:', { sugestao, categoria });
+    setEnviado(true);
+    
+    // Reset após 3 segundos
+    setTimeout(() => {
+      setSugestao('');
+      setCategoria('');
+      setEnviado(false);
+    }, 3000);
+  };
+
+  return (
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>💡 Enviar Sugestão</Text>
+      <Text style={styles.subtitle}>Compartilhe ideias para melhorar a cidade.</Text>
+      
+      {enviado ? (
+        <View style={styles.successContainer}>
+          <Text style={styles.successText}>✅ Sugestão enviada com sucesso!</Text>
+          <Text style={styles.successSubtext}>Obrigado por contribuir para melhorar nossa cidade.</Text>
+        </View>
+      ) : (
+        <>
+          <Text style={styles.label}>Categoria:</Text>
+          <View style={styles.categoriaContainer}>
+            {categorias.map((cat) => (
+              <TouchableOpacity
+                key={cat}
+                style={[
+                  styles.categoriaButton,
+                  categoria === cat && styles.categoriaButtonSelected
+                ]}
+                onPress={() => setCategoria(cat)}
+              >
+                <Text 
+                  style={[
+                    styles.categoriaText,
+                    categoria === cat && styles.categoriaTextSelected
+                  ]}
+                >
+                  {cat}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          
+          <Text style={styles.label}>Sua sugestão:</Text>
+          <TextInput
+            style={styles.input}
+            multiline
+            numberOfLines={4}
+            placeholder="Descreva sua ideia para melhorar a cidade..."
+            value={sugestao}
+            onChangeText={setSugestao}
+          />
+          
+          <TouchableOpacity style={styles.submitButton} onPress={enviarSugestao}>
+            <Text style={styles.submitButtonText}>Enviar Sugestão</Text>
+          </TouchableOpacity>
+        </>
+      )}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+    color: '#4527a0',
+  },
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#555',
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 8,
+    color: '#333',
+    fontWeight: '500',
+  },
+  categoriaContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 15,
+  },
+  categoriaButton: {
+    backgroundColor: '#e8eaf6',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    marginRight: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#c5cae9',
+  },
+  categoriaButtonSelected: {
+    backgroundColor: '#5c6bc0',
+    borderColor: '#3f51b5',
+  },
+  categoriaText: {
+    color: '#3949ab',
+  },
+  categoriaTextSelected: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  input: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    padding: 10,
+    minHeight: 100,
+    marginBottom: 20,
+    textAlignVertical: 'top',
+  },
+  submitButton: {
+    backgroundColor: '#5e35b1',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  successContainer: {
+    backgroundColor: '#e8f5e9',
+    padding: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  successText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2e7d32',
+    marginBottom: 10,
+  },
+  successSubtext: {
+    fontSize: 16,
+    color: '#388e3c',
+    textAlign: 'center',
+  }
+});

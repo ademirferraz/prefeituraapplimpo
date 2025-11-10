@@ -1,0 +1,135 @@
+import React, { useEffect, useState } from 'react';
+import { SectionList, Text, View, TouchableOpacity, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Linking from 'expo-linking';
+import { useNavigation } from '@react-navigation/native';
+import { servicesSections, CITY_HALL_BASE_URL } from '../utils/servicesCatalog';
+
+const sanitizeUrl = (url) => {
+  try {
+    // Se admin definiu um link absoluto, usa direto
+    if (/^https?:\/\//i.test(url)) return url;
+    // Caso contrário, prefixa com base da prefeitura
+    return `${CITY_HALL_BASE_URL.replace(/\/$/, '')}/${url.replace(/^\//, '')}`;
+  } catch (e) {
+    return url;
+  }
+};
+
+export default function ServicosScreen() {
+  const navigation = useNavigation();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [serviceLinks, setServiceLinks] = useState({}); // overrides definidos pelo admin
+  const [downloads, setDownloads] = useState([]); // documentos publicados pelo admin
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const admin = await AsyncStorage.getItem('adminLoggedIn');
+        setIsAdmin(admin === 'true');
+        const linksStr = await AsyncStorage.getItem('adminServiceLinks');
+        if (linksStr) {
+          setServiceLinks(JSON.parse(linksStr));
+        }
+        const docsStr = await AsyncStorage.getItem('adminDocuments');
+        if (docsStr) {
+          const parsed = JSON.parse(docsStr);
+          if (Array.isArray(parsed)) {
+            setDownloads(parsed);
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    load();
+  }, []);
+
+  const handlePress = async (item) => {
+    try {
+      if (isAdmin) {
+        navigation.navigate('PainelAdmin', {
+          manageServiceKey: item.key,
+          manageServiceLabel: item.label,
+        });
+        return;
+      }
+      const target = serviceLinks[item.key] ?? item.href;
+      const finalUrl = sanitizeUrl(target);
+      const canOpen = await Linking.canOpenURL(finalUrl);
+      if (!canOpen) throw new Error('URL inválida ou indisponível');
+      await Linking.openURL(finalUrl);
+    } catch (err) {
+      Alert.alert(
+        'Link indisponível',
+        `Não foi possível abrir "${item.label}". Caso você precise acessar este serviço, tente novamente mais tarde.\n\nAdministradores podem ajustar o link no Painel.`,
+        [
+          { text: 'OK' },
+          isAdmin
+            ? {
+                text: 'Editar no Painel',
+                onPress: () => navigation.navigate('PainelAdmin', {
+                  manageServiceKey: item.key,
+                  manageServiceLabel: item.label,
+                }),
+              }
+            : undefined,
+        ].filter(Boolean)
+      );
+    }
+  };
+
+  // Monta seção dinâmica de downloads publicados no Painel Admin
+  const downloadItems = downloads.map((d) => ({
+    key: d.id || d.url || (d.name ? d.name : Math.random().toString(36).slice(2)),
+    label: d.name || 'Documento',
+    href: d.url,
+  }));
+  const combinedSections = [
+    ...servicesSections,
+    {
+      title: 'Downloads da Prefeitura',
+      data: downloadItems,
+    },
+  ];
+
+  return (
+    <View style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
+      <SectionList
+        sections={combinedSections}
+        keyExtractor={(item) => item.key}
+        renderSectionHeader={({ section: { title } }) => (
+          <View style={{ padding: 12, backgroundColor: '#6a1b9a' }}>
+            <Text style={{ color: '#fff', fontWeight: 'bold' }}>{title}</Text>
+          </View>
+        )}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => handlePress(item)}
+            style={{
+              backgroundColor: '#fff',
+              marginHorizontal: 12,
+              marginVertical: 8,
+              borderRadius: 8,
+              padding: 12,
+              shadowColor: '#000',
+              shadowOpacity: 0.1,
+              shadowRadius: 1.5,
+            }}
+          >
+            <Text style={{ fontSize: 14, fontWeight: '600', color: '#333' }}>{item.label}</Text>
+            {serviceLinks[item.key] ? (
+              <Text style={{ fontSize: 12, color: '#6a1b9a', marginTop: 6 }}>
+                Link personalizado pelo admin
+              </Text>
+            ) : (
+              <Text style={{ fontSize: 12, color: '#777', marginTop: 6 }}>
+                Link padrão do sistema
+              </Text>
+            )}
+          </TouchableOpacity>
+        )}
+      />
+    </View>
+  );
+}

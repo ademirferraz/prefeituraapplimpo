@@ -1,0 +1,259 @@
+import { TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Button, Image, Platform, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import PostActionModal from '../components/PostActionModal';
+import { pickImageFromLibrary, pickDocument } from '../utils/attachmentPicker';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { storage, db } from '../firebaseConfig';
+import { useNavigation } from '@react-navigation/native';
+
+export default function EnviarScreen() {
+  const navigation = useNavigation();
+  const [imagem, setImagem] = useState(null);
+  const [carregando, setCarregando] = useState(false);
+  const [nome, setNome] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [visibilidade, setVisibilidade] = useState('privada'); // ou 'publica'
+  const [documento, setDocumento] = useState(null);
+  const [showPostActionModal, setShowPostActionModal] = useState(false);
+
+
+  const escolherImagem = async () => {
+    try {
+      const asset = await pickImageFromLibrary();
+      if (asset) {
+        setImagem(asset.uri);
+      }
+    } catch (error) {
+      console.error('Erro ao selecionar imagem:', error);
+      Alert.alert('Erro', 'Falha ao abrir a galeria.');
+    }
+  };
+
+  const escolherDocumento = async () => {
+    try {
+      const asset = await pickDocument();
+      if (asset) {
+        setDocumento(asset);
+      }
+    } catch (e) {
+      Alert.alert('Erro', 'Não foi possível selecionar o documento.');
+    }
+  };
+
+  const enviarDocumento = async () => {
+    if (!documento) {
+      Alert.alert('Atenção', 'Nenhum documento selecionado.');
+      return;
+    }
+
+    try {
+      setCarregando(true);
+      const nomeArquivo = `${Date.now()}-${documento.name || 'arquivo'}`;
+      const referencia = ref(storage, `documentos/${nomeArquivo}`);
+      const response = await fetch(documento.uri);
+      const blob = await response.blob();
+      await uploadBytes(referencia, blob, { contentType: documento.mimeType || blob.type });
+      const url = await getDownloadURL(referencia);
+
+      await addDoc(collection(db, 'midias'), {
+        url,
+        tipo: 'documento',
+        visibilidade,
+        nome,
+        cpf,
+        criadoEm: serverTimestamp(),
+      });
+
+      Alert.alert('Sucesso', 'Documento enviado e registrado com sucesso!');
+      setDocumento(null);
+      setShowPostActionModal(true);
+    } catch (error) {
+      console.error('Erro ao enviar documento:', error);
+      Alert.alert('Erro', 'Falha ao enviar documento.');
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  const enviarImagem = async () => {
+    if (!imagem) {
+      Alert.alert('Atenção', 'Nenhuma imagem selecionada.');
+      return;
+    }
+
+    try {
+      setCarregando(true);
+      const nomeArquivo = `imagem_${Date.now()}.jpg`;
+      const referencia = ref(storage, `imagens/${nomeArquivo}`);
+      const response = await fetch(imagem);
+      const blob = await response.blob();
+      await uploadBytes(referencia, blob);
+      const url = await getDownloadURL(referencia);
+      await addDoc(collection(db, 'midias'), {
+        url,
+        tipo: 'imagem',
+        visibilidade,
+        nome,
+        cpf,
+        criadoEm: serverTimestamp(),
+      });
+      Alert.alert('Sucesso', 'Imagem enviada e registrada com sucesso!');
+      setImagem(null);
+      setShowPostActionModal(true);
+    } catch (error) {
+      console.error('Erro ao enviar imagem:', error);
+      Alert.alert('Erro', 'Falha ao enviar imagem.');
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+ return (
+  <View style={styles.container}>
+    <Text style={styles.title}>📤 Enviar Mídia</Text>
+
+    <TextInput
+      style={styles.input}
+      placeholder="Seu nome"
+      value={nome}
+      onChangeText={setNome}
+    />
+
+    <TextInput
+      style={styles.input}
+      placeholder="CPF"
+      value={cpf}
+      onChangeText={setCpf}
+      keyboardType="numeric"
+    />
+
+    <View style={styles.visibilityContainer}>
+      <Text style={styles.visibilityLabel}>Visibilidade:</Text>
+      <View style={styles.visibilityOptions}>
+        <TouchableOpacity
+          style={[
+            styles.visibilityButton,
+            visibilidade === 'privada' && styles.visibilitySelected,
+          ]}
+          onPress={() => setVisibilidade('privada')}
+        >
+          <Text style={styles.visibilityText}>Privada</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.visibilityButton,
+            visibilidade === 'publica' && styles.visibilitySelected,
+          ]}
+          onPress={() => setVisibilidade('publica')}
+        >
+          <Text style={styles.visibilityText}>Pública</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+
+    <Button title="Escolher Imagem" onPress={escolherImagem} />
+    <View style={{ height: 8 }} />
+    <Button title="Escolher Documento" onPress={escolherDocumento} />
+
+    {imagem && <Image source={{ uri: imagem }} style={styles.image} />}
+    {documento && (
+      <Text style={{ marginTop: 10, textAlign: 'center' }}>
+        Documento selecionado: {documento.name}
+      </Text>
+    )}
+
+    {!carregando && (
+      <>
+        {imagem && <Button title="Enviar Imagem" onPress={enviarImagem} />}
+        <View style={{ height: 8 }} />
+        {documento && <Button title="Enviar Documento" onPress={enviarDocumento} />}
+      </>
+    )}
+
+    {carregando && <ActivityIndicator size="large" color="#1565c0" />}
+
+    <PostActionModal
+      visible={showPostActionModal}
+      onClose={() => setShowPostActionModal(false)}
+      onNavigateHome={() => {
+        setShowPostActionModal(false);
+        navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
+      }}
+    />
+  </View>
+);
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+    backgroundColor: '#e3f2fd',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#1565c0',
+  },
+  image: {
+    marginTop: 20,
+    width: '100%',
+    height: 300,
+    resizeMode: 'contain',
+  },
+  webWarning: {
+    marginTop: 20,
+    fontSize: 14,
+    color: '#9e9e9e',
+    textAlign: 'center',
+  },
+input: {
+  backgroundColor: '#fff',
+  padding: 10,
+  borderRadius: 5,
+  marginBottom: 10,
+  fontSize: 16,
+},
+
+visibilityContainer: {
+  marginVertical: 10,
+},
+
+visibilityLabel: {
+  fontSize: 16,
+  fontWeight: 'bold',
+  marginBottom: 5,
+  color: '#333',
+},
+
+visibilityOptions: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+},
+
+visibilityButton: {
+  flex: 1,
+  padding: 10,
+  marginHorizontal: 5,
+  borderRadius: 5,
+  borderWidth: 1,
+  borderColor: '#ccc',
+  alignItems: 'center',
+},
+
+visibilitySelected: {
+  backgroundColor: '#1565c0',
+  borderColor: '#1565c0',
+},
+
+visibilityText: {
+  color: '#fff',
+  fontWeight: 'bold',
+},
+});

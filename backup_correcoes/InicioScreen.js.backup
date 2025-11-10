@@ -1,0 +1,183 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Button,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { TextInputMask } from 'react-native-masked-text';
+
+export default function InicioScreen() {
+  const navigation = useNavigation();
+
+  const [nome, setNome] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [dataNascimento, setDataNascimento] = useState('');
+  const [senha, setSenha] = useState('');
+  const [confirmSenha, setConfirmSenha] = useState('');
+  const [senhaError, setSenhaError] = useState('');
+
+  const validarSenha = () => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+    if (!regex.test(senha)) {
+      setSenhaError(
+        'A senha deve ter pelo menos 6 caracteres, incluindo uma letra maiúscula, uma minúscula e um número.'
+      );
+      return false;
+    }
+    if (senha !== confirmSenha) {
+      setSenhaError('As senhas não coincidem.');
+      return false;
+    }
+    setSenhaError('');
+    return true;
+  };
+
+  const handleContinue = () => {
+    if (validarSenha()) {
+      navigation.navigate('MenuPrincipal');
+    }
+  };
+
+  return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <ScrollView contentContainerStyle={styles.container}>
+          {/* Roldana do admin */}
+          <TouchableOpacity style={styles.adminIcon} onPress={() => navigation.navigate('AdminLogin')}>
+            <Text style={styles.adminText}>⚙️</Text>
+          </TouchableOpacity>
+
+          {/* Logo */}
+          <Image source={require('../assets/logo.png')} style={styles.logo} />
+
+          {/* Bloco azul de boas-vindas */}
+          <View style={styles.welcomeBox}>
+            <Text style={styles.welcomeText}>Bem-vindo ao app da prefeitura</Text>
+          </View>
+
+          {/* Aviso sobre senha */}
+          <Text style={styles.passwordNotice}>
+            Cadastre-se. A senha deve ter pelo menos 6 caracteres, incluindo uma letra maiúscula, uma minúscula e um número.
+          </Text>
+
+          {/* Formulário de cadastro */}
+          <Text style={styles.sectionTitle}>Cadastre-se</Text>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Nome completo"
+            value={nome}
+            onChangeText={setNome}
+          />
+
+          <TextInputMask
+            type={'cpf'}
+            style={styles.input}
+            placeholder="CPF ou CNPJ"
+            value={cpf}
+            onChangeText={setCpf}
+          />
+
+          <TextInputMask
+            type={'datetime'}
+            options={{ format: 'DD/MM/YYYY' }}
+            style={styles.input}
+            placeholder="Data de nascimento"
+            value={dataNascimento}
+            onChangeText={setDataNascimento}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Senha"
+            value={senha}
+            onChangeText={setSenha}
+            secureTextEntry
+          />
+          <TextInput
+  style={styles.input}
+  placeholder="Repetir senha"
+  value={confirmSenha}
+  onChangeText={setConfirmSenha}
+  secureTextEntry
+  returnKeyType="done"
+  onSubmitEditing={() => {
+    Keyboard.dismiss();
+    handleContinue();
+  }}
+/>
+
+          {senhaError ? <Text style={styles.errorText}>{senhaError}</Text> : null}
+
+          <Button title="Continuar" onPress={handleContinue} />
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    paddingBottom: 60,
+    backgroundColor: '#fff',
+  },
+  adminIcon: {
+    alignSelf: 'flex-end',
+    marginBottom: 10,
+  },
+  adminText: {
+    fontSize: 24,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  welcomeBox: {
+    backgroundColor: '#007BFF',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  welcomeText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  passwordNotice: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 10,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 6,
+    padding: 10,
+    marginBottom: 10,
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
+  },
+});

@@ -1,79 +1,75 @@
+// screens/LoginScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
-export default function LoginScreen({ navigation }) {
+const LoginScreen = ({ navigation }) => {
   const [cpf, setCpf] = useState('');
   const [senha, setSenha] = useState('');
 
-  // === LIMPEZA AUTOMÁTICA DE ESTADOS AO SAIR DA TELA ===
+  // LIMPEZA TOTAL AO ENTRAR NA TELA
   useFocusEffect(
     useCallback(() => {
-      return () => {
-        setCpf(""); setSenha("");
-      };
+      setCpf('');
+      setSenha('');
     }, [])
   );
 
-
-  const handleLogin = async () => {
-    try {
-      const usuariosRef = collection(db, 'usuarios');
-      const q = query(usuariosRef, where('cpf', '==', cpf), where('senha', '==', senha));
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        Alert.alert('Login realizado com sucesso!');
-        navigation.navigate('Home');
-      } else {
-        Alert.alert('Senha incorreta', 'Esqueceu sua senha? Recupere pelo e-mail ou CPF.');
-      }
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Erro', 'Não foi possível realizar o login');
+  const entrar = () => {
+    if (!cpf || !senha) {
+      Alert.alert("Erro", "Preencha CPF e senha");
+      return;
     }
+    Alert.alert("Sucesso", "Login realizado! (simulado)");
+    navigation.navigate('Inicio');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Login</Text>
+      <Text style={styles.title}>Login</Text>
 
-      <TextInput style={styles.input} placeholder="CPF" value={cpf} onChangeText={setCpf} />
-      <TextInput style={styles.input} placeholder="Senha" value={senha} onChangeText={setSenha} secureTextEntry />
+      <TextInput
+        style={styles.input}
+        placeholder="CPF (somente números)"
+        value={cpf}
+        onChangeText={setCpf}
+        keyboardType="numeric"
+        autoComplete="off"
+        autoCorrect={false}
+        autoCapitalize="none"
+        textContentType="none"
+        importantForAutofill="no"
+      />
 
-      <TouchableOpacity style={styles.botao} onPress={handleLogin}>
-        <Text style={styles.botaoTexto}>Entrar</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Senha"
+        value={senha}
+        onChangeText={setSenha}
+        secureTextEntry
+        autoComplete="new-password"
+        importantForAutofill="no"
+      />
+
+      <TouchableOpacity style={styles.btn} onPress={entrar}>
+        <Text style={styles.btnText}>Entrar</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate('RecuperarSenha')}>
-        <Text style={styles.link}>Esqueceu sua senha?</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => navigation.navigate('Welcome')}>
-        <Text style={styles.voltar}>Voltar para a tela inicial</Text>
+        <Text style={styles.link}>Esqueceu a senha?</Text>
       </TouchableOpacity>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-  titulo: { fontSize: 22, fontWeight: 'bold', marginBottom: 20 },
-  input: {
-    backgroundColor: '#e6f2ff',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 15,
-    fontSize: 16,
-  },
-  botao: {
-    backgroundColor: '#0077cc',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  botaoTexto: { color: '#fff', fontSize: 18 },
-  link: { color: '#0077cc', marginTop: 15, textAlign: 'center' },
-  voltar: { color: '#0077cc', marginTop: 20, textAlign: 'center' },
+  container: { flex: 1, padding: 20, justifyContent: 'center', backgroundColor: '#f8f9fa' },
+  title: { fontSize: 26, fontWeight: 'bold', textAlign: 'center', marginBottom: 30, color: '#2c3e50' },
+  input: { backgroundColor: '#fff', padding: 15, borderRadius: 8, marginBottom: 15, borderWidth: 1, borderColor: '#ddd' },
+  btn: { backgroundColor: '#3498db', padding: 15, borderRadius: 8, alignItems: 'center' },
+  btnText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  link: { color: '#3498db', textAlign: 'center', marginTop: 15, textDecorationLine: 'underline' },
 });
+
+export default LoginScreen;
